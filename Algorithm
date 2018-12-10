@@ -1,0 +1,44 @@
+create and show initial start screen containing buttons for: Instructions, Create New Budget, View/Edit Budgets
+have budget# variable which will keep track of each individual budget
+
+if instructions is pressed
+  hide the buttons/open a new window
+  create a label with the instructions and show the label
+  create a back button
+  if back button is pressed
+    go back to initial start screen
+if create new budget is pressed
+  add one to budget#
+  go to add categoies method
+if edit budget is pressed
+  create a label called "All budgets"
+  create a label that will show each of the budget names
+  for i loop
+    if "categories-i" exists
+      open the file to be read from
+      set String name to the first line in the file (the name)
+      add "Budget"+ i+": name" in the label
+      close the file
+    else
+      break
+
+add categories method
+  ask user to enter name and new categories in the text entry box
+  if the save button is pressed
+    open up the file "categories-budget#" to be written on
+    overwrite the name (as the first line) and the categories into the file
+    go to edit budget method
+    close the file
+edit budget method
+  open up the file "categories-budget#" to be written on
+  create a table format with labels for each category and text entry boxes (and maybe a save button beside each entry box)
+  if save button is presssed
+    if every text entry box contains a double value
+      open file "values-budget#" to be written on
+      add each number value into the file
+    else
+      produce error message
+  if add/remove cateories button is pressed
+    go to add categories method
+  
+
