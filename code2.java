@@ -45,9 +45,11 @@ import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import java.io.*;
+
 //https://docs.oracle.com/javase/tutorial/uiswing/components/table.html
 
-class BudgetApp{ //  extends JFrame implements ActionListener 
+class BudgetApp { //  extends JFrame implements ActionListener 
     
     public static String[] categoriesArray = new String[100]; // not yet used
     public static int total = 0; // not yet used
@@ -67,7 +69,7 @@ class BudgetApp{ //  extends JFrame implements ActionListener
     public static void checkTotal(){
         total = 0;
         while (true){
-            File fileName = new File(locationAndName+(total+1)+".txt");
+            File fileName = new File(locationAndName+(total+1)+".txt"); // "P:\\budget-1"
             boolean exists = fileName.exists();
             if (exists){
                 categoriesArray[total] = (locationAndName+total+".txt");
@@ -79,77 +81,13 @@ class BudgetApp{ //  extends JFrame implements ActionListener
         System.out.println("total is "+total);
     }
     
-    // NOT WORKING
-    public static void getNamesNew(){
-        // The name of the file to open.
-        String fileName = locationAndName+0+".txt";
-
-        // This will reference one line at a time
-        String line = null;
-
-        try {
-            // FileReader reads text files in the default encoding.
-            FileReader fileReader = 
-                new FileReader(fileName);
-
-            // Always wrap FileReader in BufferedReader.
-            BufferedReader bufferedReader = 
-                new BufferedReader(fileReader);
-
-            while((line = bufferedReader.readLine()) != null) {
-                System.out.println(line);
-            }   
-
-            // Always close files.
-            bufferedReader.close();         
-        }
-        /*catch(FileNotFoundException ex) {
-            System.out.println(
-                "Unable to open file '" + 
-                fileName + "'");                
-        }*/
-        catch(IOException ex) {
-            System.out.println(
-                "Error reading file '" 
-                + fileName + "'");                  
-            // Or we could just do this: 
-            // ex.printStackTrace();
-        }
-    }
-    
-    // NOT WORKING
-    public static void getNames(){
-        
-        // FileWriter BufferedWriter PrintWriter
-        try{
-            File fileName = new File(locationAndName+0+".txt");
-            //FileReader fr = new FileReader(fileName);
-            //BufferedReader br = new BufferedReader(fr);
-            
-            /*String st; 
-            while ((st = br.readLine()) != null){ 
-                System.out.println(st); 
-            } */
-            //System.out.println(br.readLine());
-             
-            //Scanner sc = new Scanner(fileName); 
-            //while (sc.hasNextLine()) {
-            //System.out.println(sc.nextLine()); 
-            //}
-            
-            //StringBuilder sb = new StringBuilder();
-            //String line = br.readLine();
-            String records = "";
-            BufferedReader reader = new BufferedReader(new FileReader(fileName));
-            String line;
-            while ((line = reader.readLine()) != null)
-            {
-                records = records + (line);
-            }
-            reader.close();
-            
-        } catch (Exception e) { //IOException e
-            System.out.println("exception");
+    // works when invoked in main method
+    public static void getNamesNew() throws Exception{
+        File file = new File("P:\\budget-1.txt");
+        BufferedReader readline = new BufferedReader(new FileReader(file));
+        String readfirstline;
+        while ((readfirstline=readline.readLine()) != null){
+            System.out.println(readfirstline);
         }
     }
     
@@ -183,13 +121,9 @@ class BudgetApp{ //  extends JFrame implements ActionListener
         data[numIncome+numFixed+numVariable+4][2] = "0.00";
         data[numIncome+numFixed+numVariable+5][2] = "0.00";
         
-        
-        
-        
         //JTable table = new JTable(data, columnNames); // how to make basic table
         JTable table = new JTable(data, columnNames) {
-            private static final long serialVersionUID = 1L;
-
+            private static final long serialVersionUID = 1L; // not needed
             public boolean isCellEditable(int row, int column) { // disables certain parts of the table
                 if ((column==0)|| (row==0) || (row==numIncome+1) || (row==numIncome+numFixed+2)){    
                     return false;   
@@ -206,7 +140,6 @@ class BudgetApp{ //  extends JFrame implements ActionListener
         scrollPane.setSize( 100, 100 );
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         table.setFillsViewportHeight(true);
-        
         
         JPanel panel = new JPanel();
         JLabel topLabel = new JLabel("Title");
@@ -250,10 +183,7 @@ class BudgetApp{ //  extends JFrame implements ActionListener
                     isDouble=true;
                     data[i][2] = "0.00";
                     estimate[i] ="0.00";
-                }
-                    
-                
-                    
+                }  
             }
                 
             if (isDouble){ // only saves and calculates if all numbers
@@ -297,7 +227,6 @@ class BudgetApp{ //  extends JFrame implements ActionListener
                     printwrite.println(totExpenses);
                     printwrite.println("remaining buffer");
                     printwrite.println(totIncome-totExpenses);
-                    
                     
                     data[numIncome+numFixed+numVariable+3][2] = totIncome;
                     data[numIncome+numFixed+numVariable+4][2] = totExpenses;
@@ -347,9 +276,9 @@ class BudgetApp{ //  extends JFrame implements ActionListener
         
     }
     
-    // NOT SHOWING ANYTHING ON THE FRAME
+   
     public static void getCategories(){
-         JFrame categoryFrame = new JFrame("Initializing New Budget");
+        JFrame categoryFrame = new JFrame("Initializing New Budget");
         categoryFrame.setSize(300, 200);
         
         JLabel catMessage = new JLabel("fill in these fields");
@@ -361,7 +290,6 @@ class BudgetApp{ //  extends JFrame implements ActionListener
         JTextField incomeText = new JTextField(10);
         JTextField fixedText = new JTextField(10);
         JTextField varText = new JTextField(10);
-        
         
         JButton submitCategories = new JButton("submit");
         submitCategories.addActionListener(new ActionListener() {
@@ -443,7 +371,7 @@ class BudgetApp{ //  extends JFrame implements ActionListener
     
     
     // shows a list of all past saved budgets
-    public static void viewBudgets(){
+    public static void viewBudgets() throws Exception{
         checkTotal();
         getNamesNew();
         
@@ -491,7 +419,9 @@ class BudgetApp{ //  extends JFrame implements ActionListener
     }
     
     
-    public static void main(String args[]) {
+    public static void main(String args[]) throws Exception {
+        
+        getNamesNew(); // only works here
         
         JFrame homeFrame = new JFrame("Home");
         homeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -517,6 +447,7 @@ class BudgetApp{ //  extends JFrame implements ActionListener
         viewBtn.addActionListener(new ActionListener() {
             @Override
          public void actionPerformed(java.awt.event.ActionEvent evt) {
+             //getNamesNew(); also produces error here
              viewBudgets();
          }
         });
