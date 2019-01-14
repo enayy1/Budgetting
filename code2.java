@@ -8,6 +8,7 @@ package budgetapp;
 
 /*
     uses table and scroll pane
+    can now see the actual names of the budget that were saved
     currently only makes a new budget, cannot actually read from a file yet to view or edit or delete
 */
 
@@ -66,6 +67,8 @@ class BudgetApp { //  extends JFrame implements ActionListener
     
     public static JTextField title;
     
+    public static String[] namesArray;
+    
     public static void checkTotal(){
         total = 0;
         while (true){
@@ -81,14 +84,26 @@ class BudgetApp { //  extends JFrame implements ActionListener
         System.out.println("total is "+total);
     }
     
-    // works when invoked in main method
-    public static void getNamesNew() throws Exception{
-        File file = new File("P:\\budget-1.txt");
-        BufferedReader readline = new BufferedReader(new FileReader(file));
+    // works when invoked in main method only
+    public static void getNamesNew() { // works when "throws Exception" is removed
+        
+        try{ // did in try catch
+            
+        checkTotal();
         String readfirstline;
-        while ((readfirstline=readline.readLine()) != null){
-            System.out.println(readfirstline);
+        File file;
+        BufferedReader readline;
+        namesArray = new String[total];
+        
+        for (int i=1; i<=total; i++){
+            file = new File("P:\\budget-"+i+".txt");
+            readline = new BufferedReader(new FileReader(file));
+            namesArray[i-1] = readline.readLine();
         }
+        
+        }catch (IOException e) {
+            System.out.println("couldnt get names");
+        } 
     }
     
     
@@ -371,8 +386,7 @@ class BudgetApp { //  extends JFrame implements ActionListener
     
     
     // shows a list of all past saved budgets
-    public static void viewBudgets() throws Exception{
-        checkTotal();
+    public static void viewBudgets(){
         getNamesNew();
         
         JLabel viewLabel = new JLabel("select a file to view it");
@@ -380,7 +394,7 @@ class BudgetApp { //  extends JFrame implements ActionListener
         String[] header = {"budget names"};
         Object[][] namesList = new Object[total][1];
         for (int i=0; i<total; i++){
-            namesList[i][0] = "budget "+String.valueOf(i+1);
+            namesList[i][0] = namesArray[i];
         }
         
         JTable contentTable = new JTable(namesList, header){
@@ -419,7 +433,7 @@ class BudgetApp { //  extends JFrame implements ActionListener
     }
     
     
-    public static void main(String args[]) throws Exception {
+    public static void main(String args[])  {//throws Exception
         
         getNamesNew(); // only works here
         
@@ -447,7 +461,7 @@ class BudgetApp { //  extends JFrame implements ActionListener
         viewBtn.addActionListener(new ActionListener() {
             @Override
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-             //getNamesNew(); also produces error here
+             //getNamesNew();
              viewBudgets();
          }
         });
