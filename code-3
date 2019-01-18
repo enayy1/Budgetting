@@ -7,16 +7,11 @@ package budgetapp;
 
 
 /*
-uses table and scroll pane
-currently only makes a new budget
 
 to improve output: 
-make so can only enter positive numbers 
 don't show total income, expenses and remaining buffer
 make so entering number removes zero
-make getting categories clearer
 
-    
 */
 
 //import java.awt.Frame;  
@@ -178,10 +173,11 @@ class BudgetApp { //  extends JFrame implements ActionListener
         table.setFillsViewportHeight(true);
         
         JPanel panel = new JPanel();
-        JLabel topLabel = new JLabel("Title");
+        JLabel titleLabel = new JLabel("Title");
+        
         titleField = new JTextField(10);
         titleField.setText(titleName);
-        panel.add(topLabel);
+        panel.add(titleLabel);
         panel.add(titleField);
         
         JLabel label = new JLabel("Press to save");
@@ -268,8 +264,11 @@ class BudgetApp { //  extends JFrame implements ActionListener
                     data[numIncome+numFixed+numVariable+4][2] = totExpenses;
                     data[numIncome+numFixed+numVariable+5][2] = totIncome-totExpenses;
                     
-                    messageLabel.setText("saved");
-                    System.out.println("saved data");
+                    if (messageLabel.getText()=="saved"){
+                        messageLabel.setText("resaved");
+                    }else{
+                        messageLabel.setText("saved");
+                    }
                     
                     
                 } catch (IOException e) { // exception in case file not found or error in location
@@ -277,27 +276,35 @@ class BudgetApp { //  extends JFrame implements ActionListener
                 }
                     
             }else{
-                messageLabel.setText("couln'd save, not all number values");
-                System.out.println("couldn't save, not all number values");
+                if (messageLabel.getText()=="couldn't save, not all positive number values"){
+                    messageLabel.setText("still not positve number values");
+                }else{
+                    messageLabel.setText("couldn't save, not all positive number values");
+                }
             }
             
             // not neccessary to have this
-            try{
+            /*try{
                 Thread.sleep(2000); // will wait 2 seconds before continuing, not really working
+                System.out.println("waited 2s");
             }catch(InterruptedException ex){
-                Thread.currentThread().interrupt();
+                //Thread.currentThread().interrupt();
                 System.out.println("thread interrupt");
             }
             messageLabel.setText("press to resave");
-            label.setText("press to resave");
+            label.setText("press to resave");*/
                
             
          }
         });
 
         //Creating the Frame
-        JFrame frame = new JFrame("Edit Budget");
-        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame frame;
+        if (isNewBudget){
+            frame = new JFrame("New Budget");
+        }else{
+            frame = new JFrame("Edit "+titleName);
+        }
         frame.setSize(500, 400);
         
         frame.setLayout(new BorderLayout());
@@ -400,65 +407,52 @@ class BudgetApp { //  extends JFrame implements ActionListener
         
         try{ // did in try catch
             
-        String readfirstline;
-        File file = new File(locationAndName+currentBudget+".txt");;
-        BufferedReader readline = new BufferedReader(new FileReader(file));;
-        namesArray = new String[total];
+            String readfirstline;
+            File file = new File(locationAndName+currentBudget+".txt");
+            BufferedReader readline = new BufferedReader(new FileReader(file));
+            namesArray = new String[total];
+            
+            titleName = (readline.readLine());
+            
+            numIncome = Integer.parseInt(readline.readLine());
+            numFixed = Integer.parseInt(readline.readLine());
+            numVariable = Integer.parseInt(readline.readLine());
+            
+            String extraString; // just to account for space
+            
+            data = new Object[numIncome+numFixed+numVariable+6][3];
         
-        while ((readfirstline=readline.readLine()) != null){
-            //readline = new BufferedReader(new FileReader(file));
-            System.out.println(readfirstline);
-        }
-        
-        readline = new BufferedReader(new FileReader(file));;
-        namesArray = new String[total];
-        
-        titleName = (readline.readLine());
-        
-        numIncome = Integer.parseInt(readline.readLine());
-        numFixed = Integer.parseInt(readline.readLine());
-        numVariable = Integer.parseInt(readline.readLine());
-        
-        System.out.println(numIncome+" "+numFixed+" "+ numVariable);
-        
-        data = new Object[numIncome+numFixed+numVariable+6][3];
-        
-        System.out.println(readline.readLine());
-        data[0][0] = "disposable income";
-        for (int i=0; i<numIncome; i++){
-            data[i+1][0] = i+1;
-            data[i+1][1] = readline.readLine();
-            data[i+1][2] = readline.readLine();
-        }
-        System.out.println(readline.readLine());
-        data[numIncome+1][0] = "fixed expenses";
-        for (int i=0; i<numFixed; i++){
-            data[i+numIncome+2][0] = i+1;
-            data[i+numIncome+2][1] = readline.readLine();
-            data[i+numIncome+2][2] = readline.readLine();
-        }
-        System.out.println(readline.readLine());
-        data[numIncome+numFixed+2][0] = "variable expenses";
-        for (int i=0; i<numVariable; i++){
-            data[i+numIncome+numFixed+3][0] = i+1;
-            data[i+numIncome+numFixed+3][1] = readline.readLine();
-            data[i+numIncome+numFixed+3][2] = readline.readLine();
-        }
-        System.out.println(readline.readLine());
-        data[numIncome+numFixed+numVariable+3][1] = readline.readLine();
-        data[numIncome+numFixed+numVariable+3][2] = readline.readLine();
-        data[numIncome+numFixed+numVariable+4][1] = readline.readLine();
-        data[numIncome+numFixed+numVariable+4][2] = readline.readLine();
-        data[numIncome+numFixed+numVariable+5][1] = readline.readLine();
-        data[numIncome+numFixed+numVariable+5][2] = readline.readLine();
-        
-        
-        editBudget();
-    
-        
-        
+            extraString = (readline.readLine());
+            data[0][0] = "disposable income";
+            for (int i=0; i<numIncome; i++){
+                data[i+1][0] = i+1;
+                data[i+1][1] = readline.readLine();
+                data[i+1][2] = readline.readLine();
+            }
+            extraString = (readline.readLine());
+            data[numIncome+1][0] = "fixed expenses";
+            for (int i=0; i<numFixed; i++){
+                data[i+numIncome+2][0] = i+1;
+                data[i+numIncome+2][1] = readline.readLine();
+                data[i+numIncome+2][2] = readline.readLine();
+            }
+            extraString = (readline.readLine());
+            data[numIncome+numFixed+2][0] = "variable expenses";
+            for (int i=0; i<numVariable; i++){
+                data[i+numIncome+numFixed+3][0] = i+1;
+                data[i+numIncome+numFixed+3][1] = readline.readLine();
+                data[i+numIncome+numFixed+3][2] = readline.readLine();
+            }
+            extraString = (readline.readLine());
+            for (int i=0; i<3; i++){
+                data[numIncome+numFixed+numVariable+3+i][1] = readline.readLine();
+                data[numIncome+numFixed+numVariable+3+i][2] = readline.readLine();
+            }
+            
+            editBudget();
+            
         }catch (IOException e) {
-            System.out.println("couldnt show the file");
+            System.out.println("couldn't show the file");
         } 
 
         
@@ -513,21 +507,31 @@ class BudgetApp { //  extends JFrame implements ActionListener
         
     }
     
+    public static void viewInstructions(){
+        
+        JTextArea textArea = new JTextArea(5, 20);
+        
+        textArea.append("hello\n this is a test\n put instructions here\n");
+        textArea.setEditable(false);
+        
+        JFrame instFrame = new JFrame("Instructions");
+        instFrame.setSize(300, 200);
+        instFrame.add(textArea);
+        instFrame.setVisible(true);
+    }
+    
     
     public static void main(String args[])  {//throws Exception
         
         
         JFrame homeFrame = new JFrame("Home");
         homeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        homeFrame.setSize(250, 200);
+        homeFrame.setSize(400, 200);
         homeFrame.setLayout(new GridLayout(3,2));
         homeFrame.setVisible(true);
         
         
         JButton newBtn = new JButton("New Budget");
-        JPanel homePanel = new JPanel();
-        
-        homePanel.add(newBtn);
         newBtn.addActionListener(new ActionListener() {
             @Override
          public void actionPerformed(java.awt.event.ActionEvent evt) { // can only call one method?
@@ -542,12 +546,28 @@ class BudgetApp { //  extends JFrame implements ActionListener
         viewBtn.addActionListener(new ActionListener() {
             @Override
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-             isNewBudget = true;
-             viewBudgets(); //getNamesNew(); works here
+             isNewBudget = false; 
+             viewBudgets(); 
          }
         });
         
+        
+        JButton instBtn = new JButton("Instructions");
+        instBtn.addActionListener(new ActionListener() {
+            @Override
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+             viewInstructions();
+         }
+        });
+        
+        JPanel homePanel = new JPanel();
+        GridLayout homegrid = new GridLayout(3, 1);
+        //homePanel.setLayout(homegrid);
+        
+        homePanel.add(newBtn);
         homePanel.add(viewBtn);
+        homePanel.add(instBtn);
+        
         homeFrame.add(homePanel, BorderLayout.CENTER);
        
     }
