@@ -11,6 +11,8 @@ package budgetapp;
 to improve output: 
 don't show total income, expenses and remaining buffer
 make so entering number removes zero
+ability to delete files
+have everything on one screen
 
 */
 
@@ -54,8 +56,7 @@ import java.io.*;
 
 class BudgetApp { //  extends JFrame implements ActionListener 
     
-    public static String[] categoriesArray = new String[100]; // not yet used
-    public static int total = 0; // not yet used
+    public static int total = 0; 
     public static String locationAndName = "P:\\budget-"; // easier for working on different computers/file directories
     
     public static Object[][] data;
@@ -79,7 +80,6 @@ class BudgetApp { //  extends JFrame implements ActionListener
             File fileName = new File(locationAndName+(total+1)+".txt"); // "P:\\budget-1"
             boolean exists = fileName.exists();
             if (exists){
-                categoriesArray[total] = (locationAndName+total+".txt");
                 total+=1;
             }else{
                 break;
@@ -89,21 +89,21 @@ class BudgetApp { //  extends JFrame implements ActionListener
     }
     
     // works when invoked in main method only
-    public static void getNamesNew() { // works when "throws Exception" is removed
+    public static void getNames() { // works when "throws Exception" is removed
         
         try{ // did in try catch
             
-        checkTotal();
-        String readfirstline;
-        File file;
-        BufferedReader readline;
-        namesArray = new String[total];
+            checkTotal();
+            String readfirstline;
+            File file;
+            BufferedReader readline;
+            namesArray = new String[total];
         
-        for (int i=1; i<=total; i++){
-            file = new File(locationAndName+i+".txt");
-            readline = new BufferedReader(new FileReader(file));
-            namesArray[i-1] = readline.readLine();
-        }
+            for (int i=1; i<=total; i++){
+                file = new File(locationAndName+i+".txt");
+                readline = new BufferedReader(new FileReader(file));
+                namesArray[i-1] = readline.readLine();
+            }
         
         }catch (IOException e) {
             System.out.println("couldnt get names");
@@ -180,9 +180,7 @@ class BudgetApp { //  extends JFrame implements ActionListener
         panel.add(titleLabel);
         panel.add(titleField);
         
-        JLabel label = new JLabel("Press to save");
         JButton save = new JButton("Calculate and Save");
-        //panel.add(label);
         panel.add(save);
         save.addActionListener(new ActionListener() {
             @Override
@@ -195,9 +193,10 @@ class BudgetApp { //  extends JFrame implements ActionListener
                 
             for (int i=0; i<(numIncome+numFixed+numVariable+3); i++){
                     
-                if ((i==0)|| (i==(numIncome+1)) || (i==numIncome+numFixed+2)){
+                if ((i==0)|| (i==(numIncome+1)) || (i==numIncome+numFixed+2)){ // are the spaces
                     continue;
                 }
+                
                 categories[i] = (String.valueOf (data[i][1]));
                 estimate[i] = (String.valueOf (data[i][2]));
                 
@@ -208,15 +207,22 @@ class BudgetApp { //  extends JFrame implements ActionListener
                 isDouble = checkNum(estimate[i], "double");
                     
                 // if they are empty
-                if (categories[i]==""){
-                    categories[i] ="null";
-                }
+                //if (categories[i]==""){
+                //    categories[i] ="null";
+                //}
                     
-                if (estimate[i]=="null"|| estimate[i]=="" || estimate[i]=="0.00"){ 
+                if (data[i][2]=="null"|| data[i][2]=="" || data[i][2]=="0.00"){ 
                     isDouble=true;
                     data[i][2] = "0.00";
                     estimate[i] ="0.00";
                 }  
+                
+                // trying to debug
+                if (!isDouble){
+                    System.out.println(i+"*"+data[i][2]+"*");
+                    
+                }
+                
             }
                 
             if (isDouble){ // only saves and calculates if all numbers
@@ -241,7 +247,7 @@ class BudgetApp { //  extends JFrame implements ActionListener
                     printwrite.println(numVariable);
                     for (int i=0; i<(numIncome+numFixed+numVariable+3); i++){
                         if ((i==0)|| (i==(numIncome+1)) || (i==numIncome+numFixed+2)){
-                            printwrite.println("");
+                            printwrite.println("**********");
                             continue;
                         }
                         if (i<=numIncome+1){
@@ -252,7 +258,7 @@ class BudgetApp { //  extends JFrame implements ActionListener
                         printwrite.println(categories[i]);
                         printwrite.println(estimate[i]); 
                     }
-                    printwrite.println("");
+                    printwrite.println("**********");
                     printwrite.println("total income");
                     printwrite.println(totIncome);
                     printwrite.println("total expenses");
@@ -282,17 +288,6 @@ class BudgetApp { //  extends JFrame implements ActionListener
                     messageLabel.setText("couldn't save, not all positive number values");
                 }
             }
-            
-            // not neccessary to have this
-            /*try{
-                Thread.sleep(2000); // will wait 2 seconds before continuing, not really working
-                System.out.println("waited 2s");
-            }catch(InterruptedException ex){
-                //Thread.currentThread().interrupt();
-                System.out.println("thread interrupt");
-            }
-            messageLabel.setText("press to resave");
-            label.setText("press to resave");*/
                
             
          }
@@ -403,9 +398,9 @@ class BudgetApp { //  extends JFrame implements ActionListener
     
     
     
-    public static void seeBudget(){
+    public static void getBudgetInfo(){
         
-        try{ // did in try catch
+        try{ 
             
             String readfirstline;
             File file = new File(locationAndName+currentBudget+".txt");
@@ -462,7 +457,10 @@ class BudgetApp { //  extends JFrame implements ActionListener
     
     // shows a list of all past saved budgets
     public static void viewBudgets(){
-        getNamesNew();
+        getNames();
+        
+        JFrame viewFrame = new JFrame("contents");
+        viewFrame.setSize(300, 200);
         
         JLabel viewLabel = new JLabel("select a file to view it");
              
@@ -486,9 +484,10 @@ class BudgetApp { //  extends JFrame implements ActionListener
              if (row==-1){
                  viewLabel.setText("you didn't select anything");
              }else{
+                viewFrame.setVisible(false);
                 currentBudget = row+1;
                 System.out.println("you selected: "+namesList[row][0]);
-                seeBudget();
+                getBudgetInfo();
              }
          }
         });
@@ -498,8 +497,7 @@ class BudgetApp { //  extends JFrame implements ActionListener
         viewScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         contentTable.setFillsViewportHeight(true);
         
-        JFrame viewFrame = new JFrame("contents");
-        viewFrame.setSize(300, 200);
+        
         viewFrame.add(viewLabel, BorderLayout.NORTH);
         viewFrame.add(viewScrollPane, BorderLayout.CENTER);
         viewFrame.add(selectBtn, BorderLayout.SOUTH);
