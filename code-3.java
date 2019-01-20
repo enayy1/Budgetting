@@ -9,9 +9,9 @@ package budgetapp;
 /*
 
 to improve output: 
-don't show total income, expenses and remaining buffer
 make so entering number removes zero
 ability to delete files
+changing colour of certain cells in table
 have everything on one screen
 
 */
@@ -112,7 +112,7 @@ class BudgetApp { //  extends JFrame implements ActionListener
     
     public static void newBudgetSetup(){
         checkTotal();
-        data = new Object[numIncome+numFixed+numVariable+6][3];
+        data = new Object[numIncome+numFixed+numVariable+3][3];
         data[0][0] = "disposable income";
         for (int i=0; i<numIncome; i++){
             data[i+1][0] = i+1;
@@ -128,16 +128,20 @@ class BudgetApp { //  extends JFrame implements ActionListener
             data[i+numIncome+numFixed+3][0] = i+1;
             data[i+numIncome+numFixed+3][2] = "0.00";
         }
-        data[numIncome+numFixed+numVariable+3][1] = "total income";
+        /*data[numIncome+numFixed+numVariable+3][1] = "total income";
         data[numIncome+numFixed+numVariable+4][1] = "total expenses";
         data[numIncome+numFixed+numVariable+5][1] = "remaining buffer";
         data[numIncome+numFixed+numVariable+3][2] = "0.00";
         data[numIncome+numFixed+numVariable+4][2] = "0.00";
-        data[numIncome+numFixed+numVariable+5][2] = "0.00";
+        data[numIncome+numFixed+numVariable+5][2] = "0.00";*/
         
         titleName = "";
         
         currentBudget = total+1;
+                
+        totIncome = 0.00;
+        totExpenses = 0.00;
+            
         
         editBudget();
     }
@@ -149,54 +153,18 @@ class BudgetApp { //  extends JFrame implements ActionListener
         
         //JTable table = new JTable(data, columnNames); // how to make basic table
         JTable table = new JTable(data, columnNames) {
-            private static final long serialVersionUID = 1L; // not needed
-            public boolean isCellEditable(int row, int column) { // disables certain parts of the table
+            //private static final long serialVersionUID = 1L; // not needed
+            public boolean isCellEditable(int row, int column) { // isCellEditable disables certain parts of the table
                 if ((column==0)|| (row==0) || (row==numIncome+1) || (row==numIncome+numFixed+2)){    
                     return false;   
-                }else if (row >=numIncome+numFixed+numVariable+3){
-                    return false; 
+                //}else if (row >=numIncome+numFixed+numVariable+3){
+                    //return false; 
                 }else{
                     return true;
                 }
             };
             
             
-            
-            public void setRowColour(int row, Color c) {
-                rowColours.set(row, c);
-                fireTableRowsUpdated(row, row);
-            };
-            
-            
-            public Color getRowColour(int row) {
-                return rowColours.get(row);
-            }
-
-            @Override
-            public int getRowCount() {
-                return 3;
-            }
-
-            @Override
-            public int getColumnCount() {
-                return 3;
-            }
-            
-            public Color getRowColour(int row) {
-                return rowColours.get(row);
-            }
-
-            @Override
-            public int getRowCount() {
-                return 3;
-            }
-
-            @Override
-            public int getColumnCount() {
-                return 3;
-            }
-
-
             
         };
         
@@ -206,21 +174,48 @@ class BudgetApp { //  extends JFrame implements ActionListener
         JLabel messageLabel = new JLabel("fill in the following table");
         messagePanel.add(messageLabel);
         
-        //JPanel mainPanel = new JPanel();
-        //mainPanel.add(table);
+        JPanel mainPanel = new JPanel();
+        mainPanel.add(table);
         
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setSize( 100, 100 );
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         table.setFillsViewportHeight(true);
         
+        
+        ///// Bottom panel start
+        
         JPanel panel = new JPanel();
         JLabel titleLabel = new JLabel("Title");
-        
         titleField = new JTextField(10);
         titleField.setText(titleName);
         panel.add(titleLabel);
         panel.add(titleField);
+        
+        
+        JPanel bufferPanel = new JPanel();
+        JLabel incomeLabel = new JLabel("Total Income: ");
+        JLabel expensesLabel = new JLabel("Total Expenses: ");
+        JLabel bufferLabel = new JLabel("Remaining Buffer: ");
+        JLabel incomeNumLabel = new JLabel("$ " + totIncome);
+        JLabel expensesNumLabel = new JLabel("$ " + totExpenses);
+        JLabel bufferNumLabel = new JLabel("$ " + (totIncome-totExpenses ));
+        
+        GridLayout bufferGrid = new GridLayout(3, 2);
+        bufferPanel.setLayout(bufferGrid);
+        bufferPanel.add(incomeLabel);
+        bufferPanel.add(incomeNumLabel);
+        bufferPanel.add(expensesLabel);
+        bufferPanel.add(expensesNumLabel);
+        bufferPanel.add(bufferLabel);
+        bufferPanel.add(bufferNumLabel);
+                
+        
+        JPanel bottomPanel = new JPanel();
+        GridLayout bottomGrid = new GridLayout(2, 1);
+        bottomPanel.setLayout(bottomGrid);
+        bottomPanel.add(bufferPanel);
+        bottomPanel.add(panel);
         
         JButton save = new JButton("Calculate and Save");
         panel.add(save);
@@ -249,9 +244,9 @@ class BudgetApp { //  extends JFrame implements ActionListener
                 isDouble = checkNum(estimate[i], "double");
                     
                 // if they are empty
-                //if (categories[i]==""){
-                //    categories[i] ="null";
-                //}
+                if (categories[i]=="null"){
+                    categories[i] ="";
+                }
                     
                 if (data[i][2]=="null"|| data[i][2]=="" || data[i][2]=="0.00"){ 
                     isDouble=true;
@@ -301,16 +296,16 @@ class BudgetApp { //  extends JFrame implements ActionListener
                         printwrite.println(estimate[i]); 
                     }
                     printwrite.println("**********");
-                    printwrite.println("total income");
                     printwrite.println(totIncome);
-                    printwrite.println("total expenses");
                     printwrite.println(totExpenses);
-                    printwrite.println("remaining buffer");
                     printwrite.println(totIncome-totExpenses);
                     
-                    data[numIncome+numFixed+numVariable+3][2] = totIncome;
-                    data[numIncome+numFixed+numVariable+4][2] = totExpenses;
-                    data[numIncome+numFixed+numVariable+5][2] = totIncome-totExpenses;
+                    //data[numIncome+numFixed+numVariable+3][2] = totIncome;
+                    //data[numIncome+numFixed+numVariable+4][2] = totExpenses;
+                    //data[numIncome+numFixed+numVariable+5][2] = totIncome-totExpenses;
+                    incomeNumLabel.setText("$ " + totIncome);
+                    expensesNumLabel.setText("$ " + totExpenses);
+                    bufferNumLabel.setText("$ " + (totIncome-totExpenses ));
                     
                     if (messageLabel.getText()=="saved"){
                         messageLabel.setText("resaved");
@@ -334,6 +329,8 @@ class BudgetApp { //  extends JFrame implements ActionListener
             
          }
         });
+        
+        ///// Bottom panel end
 
         //Creating the Frame
         JFrame frame;
@@ -348,9 +345,11 @@ class BudgetApp { //  extends JFrame implements ActionListener
         //frame.add(table.getTableHeader(), BorderLayout.PAGE_START);
         //frame.add(table, BorderLayout.CENTER); //needs to be out so scroll pane can work
         
+        
+        
         frame.add(messagePanel, BorderLayout.NORTH);
         frame.add(scrollPane, BorderLayout.CENTER);
-        frame.add(panel, BorderLayout.SOUTH);
+        frame.add(bottomPanel, BorderLayout.SOUTH);
 
         
         frame.setVisible(true);
@@ -457,7 +456,7 @@ class BudgetApp { //  extends JFrame implements ActionListener
             
             String extraString; // just to account for space
             
-            data = new Object[numIncome+numFixed+numVariable+6][3];
+            data = new Object[numIncome+numFixed+numVariable+3][3];
         
             extraString = (readline.readLine());
             data[0][0] = "disposable income";
@@ -481,10 +480,19 @@ class BudgetApp { //  extends JFrame implements ActionListener
                 data[i+numIncome+numFixed+3][2] = readline.readLine();
             }
             extraString = (readline.readLine());
-            for (int i=0; i<3; i++){
-                data[numIncome+numFixed+numVariable+3+i][1] = readline.readLine();
-                data[numIncome+numFixed+numVariable+3+i][2] = readline.readLine();
-            }
+            
+            //data[numIncome+numFixed+numVariable+3][1] = readline.readLine();
+            totIncome = Double.valueOf(readline.readLine());
+            //data[numIncome+numFixed+numVariable+3][2] = totIncome;
+            
+            //data[numIncome+numFixed+numVariable+4][1] = readline.readLine();
+            totExpenses = Double.valueOf(readline.readLine());
+            //data[numIncome+numFixed+numVariable+4][2] = totExpenses;
+            
+            //data[numIncome+numFixed+numVariable+5][1] = readline.readLine();
+            //data[numIncome+numFixed+numVariable+5][2] = readline.readLine();
+            
+            
             
             editBudget();
             
