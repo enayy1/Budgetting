@@ -57,7 +57,7 @@ import java.io.*;
 class BudgetApp { //  extends JFrame implements ActionListener 
     
     public static int total = 0; 
-    public static String locationAndName = "P:\\budget-"; // easier for working on different computers/file directories
+    public static String locationAndName = "C:\\Users\\Thanuja\\Desktop\\budgets\\budget-"; // easier for working on different computers/file directories
     
     public static Object[][] data;
     public static int numIncome;
@@ -145,7 +145,7 @@ class BudgetApp { //  extends JFrame implements ActionListener
     
     public static void editBudget(){
         
-        String[] columnNames = {"item num", "category", "estimate"};
+        String[] columnNames = {"category", "name", "estimate"};
         
         //JTable table = new JTable(data, columnNames); // how to make basic table
         JTable table = new JTable(data, columnNames) {
@@ -159,6 +159,45 @@ class BudgetApp { //  extends JFrame implements ActionListener
                     return true;
                 }
             };
+            
+            
+            
+            public void setRowColour(int row, Color c) {
+                rowColours.set(row, c);
+                fireTableRowsUpdated(row, row);
+            };
+            
+            
+            public Color getRowColour(int row) {
+                return rowColours.get(row);
+            }
+
+            @Override
+            public int getRowCount() {
+                return 3;
+            }
+
+            @Override
+            public int getColumnCount() {
+                return 3;
+            }
+            
+            public Color getRowColour(int row) {
+                return rowColours.get(row);
+            }
+
+            @Override
+            public int getRowCount() {
+                return 3;
+            }
+
+            @Override
+            public int getColumnCount() {
+                return 3;
+            }
+
+
+            
         };
         
         //table.setBackground(Color.GREEN); // changes whole table
@@ -166,6 +205,9 @@ class BudgetApp { //  extends JFrame implements ActionListener
         JPanel messagePanel = new JPanel();
         JLabel messageLabel = new JLabel("fill in the following table");
         messagePanel.add(messageLabel);
+        
+        //JPanel mainPanel = new JPanel();
+        //mainPanel.add(table);
         
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setSize( 100, 100 );
