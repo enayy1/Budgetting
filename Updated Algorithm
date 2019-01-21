@@ -1,0 +1,111 @@
+create a class for the budget app
+
+initialize integer total
+
+main method
+
+  create a new gui frame
+  close the program if the user exits this screen
+  
+  button to make a new budget
+    go to get cateogires method
+  button to view budgets
+    go to view budgets method
+  button to view instructions
+    go to view instructions method
+
+view instructions method
+  outputs the instructions onto a new frame
+  output the frame on the screen
+
+check total method (checks how many budgets are there total)
+  set total to 0
+  set integer i to 0
+  while loop
+    check if file i exists
+    if i exists
+      add one to i
+      add one to total
+    else
+      exit the loop
+  
+
+get names method
+  go to check total method
+  for loop until variable i is equal to total
+    reads the first line of each file (the name of the budget the user gave)
+    saves the names into an array
+
+get categories method
+  ask how many items there are in each category: disposable income, fixed expenses, variable expenses
+  have a text box for each of the categories, for the user to put them in
+  create a 'submit' button
+  if button is pressed
+    if all the user inputs are integers (go to check number method for each item)
+      go to new budget setup method
+    else
+      output error message
+
+view budgets method
+ to go get names method
+ output each of the budget names onto a new frame and show the frame
+ create a 'select' button
+ if button is pressed
+  if the user selected a budget
+   check which budget the user selected
+   to to get budget's info method
+  else
+    output error message
+
+get budget's info method
+  based on the budget the user selected, read and save the lines of the file onto an array
+  create new object 'data' with a size based on the total number of categories
+  go to edit budget method
+
+new budget setup method
+  create new object 'data' with a size based on the total number of categories (disposable income + fixed expenses + variable expenses)
+  go to edit budget method
+  
+edit budget method
+
+  create new table to show all the data
+  create 'title' label with a textfield beside it (where user will put the name they want)
+  
+  create 'save' button
+  if button is pressed
+    initialize boolean 'is double' equal to true
+    for loop of total number of categories
+      if is double
+        got to check number method (try converting the item in the cell to a double)
+        if error
+          set is double equal to false
+        else if cell value is not positive
+          set is double equal to false
+      
+        
+    if is double (all the cells for the amount of money contain double inputs and they are all positive)
+      open a new file and overwrite it
+      if the title text field is empty
+        put 'untitled' in the first line of the file
+      else
+        put the name of the budget on the first line of the file
+      save the data onto a file
+    else
+      output error message saying that not all positive number inputs
+
+check number method
+  if checking if integer
+    try converting to integer
+      if error
+        return false (not a double integer)
+      else
+        return true (is a valid integer)
+  else if checking if double
+    try converting to double
+    if error
+      return false (not a double value)
+    else
+      return true (is a valid double)
+  else
+    return false (error in programming)
+
